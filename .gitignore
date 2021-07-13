@@ -1,0 +1,6 @@
+#pycharm settings
+__pycache__
+.idea
+
+#dataset folder
+datasets/
