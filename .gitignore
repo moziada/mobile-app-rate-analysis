@@ -4,3 +4,4 @@ __pycache__
 
 #dataset folder
 datasets/
+!datasets/.gitkeep
