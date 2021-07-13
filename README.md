@@ -2,9 +2,9 @@
 
 On this project i tried to analyse [Mobile App Store](https://www.kaggle.com/ramamet4/app-store-apple-data-set-10k-apps) dataset and build regression models using sklearn to predict user rating for the app.
 
-## download dataset
+## Download Dataset
 
-you could download the dataset from [here](https://www.kaggle.com/ramamet4/app-store-apple-data-set-10k-apps), and place it on "datasets" directory.
+Download the dataset from [here](https://www.kaggle.com/ramamet4/app-store-apple-data-set-10k-apps), and place it on "datasets" directory.
 
 ## Data Preparation
 

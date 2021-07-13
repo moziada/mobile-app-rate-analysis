@@ -3,5 +3,5 @@ __pycache__
 .idea
 
 #dataset folder
-datasets/
-!datasets/.gitkeep
+datasets/AppleStore.csv
+datasets/appleStore_description.csv
