@@ -7,6 +7,7 @@ import os
 
 dataSet_path = 'datasets'
 
+
 def Normalize_df(ColumnFeatures):
     ColumnFeatures = np.expand_dims(ColumnFeatures.to_numpy(), axis=1)
     scaler = preprocessing.MinMaxScaler().fit(ColumnFeatures)
@@ -15,18 +16,15 @@ def Normalize_df(ColumnFeatures):
 
 def dataPreparation(mainData, bonus=True, reduce_features=False):
     if bonus:
-        extraData = pd.read_csv(os.path.join(dataSet_path, 'appleStore_description.csv'))
-        desc = extraData['app_desc']
-        wordscount = []
-        for i in range(mainData.shape[0]):
-            wordscount.append(len(desc[i].split()))
+        desc_df = pd.read_csv(os.path.join(dataSet_path, 'appleStore_description.csv'))
+        desc_df.drop(['track_name', 'size_bytes'], axis=1, inplace=True)
 
-        wordscountdf = pd.DataFrame(wordscount)
-        mainData['desc_word_count'] = wordscountdf
+        mainData = pd.merge(mainData, desc_df, 'left', on='id')
+        mainData['app_desc'] = mainData['app_desc'].apply(lambda x: len(x.split()))
+
         # mainData.to_csv('AppleStore_training_ExtraFeature.csv', index=False, header=True)
 
-    mainData = mainData.iloc[:, 1:]  # drop first column (app number on the csv file)
-    data = mainData.drop(['id', 'track_name', 'currency', 'vpp_lic', 'ver'], axis=1)
+    data = mainData.drop(['Unnamed: 0', 'id', 'track_name', 'currency', 'vpp_lic', 'ver'], axis=1)
     data.dropna(how='any', inplace=True)  # delete entire row if a cell is missing
 
     data['size_bytes'] = Normalize_df(data['size_bytes'])  # size is normalized now, ranges from 0 to 1
@@ -38,7 +36,7 @@ def dataPreparation(mainData, bonus=True, reduce_features=False):
     data['ipadSc_urls.num'] = Normalize_df(data['ipadSc_urls.num'])
     data['lang.num'] = Normalize_df(data['lang.num'])
     if bonus:
-        data['desc_word_count'] = Normalize_df(data['desc_word_count'])
+        data['app_desc'] = Normalize_df(data['app_desc'])
 
     contentRatingOneHot = pd.get_dummies(data['cont_rating'])
     primeGenreOneHot = pd.get_dummies(data['prime_genre'])
@@ -47,18 +45,9 @@ def dataPreparation(mainData, bonus=True, reduce_features=False):
     data = data.join(primeGenreOneHot)
 
     if reduce_features:
-        dataDict = {'size_bytes': data['size_bytes'],
-                    'rating_count_tot': data['rating_count_tot'],
-                    'rating_count_ver': data['rating_count_ver'],
-                    'user_rating_ver': data['user_rating_ver'],
-                    'ipadSc_urls.num': data['ipadSc_urls.num'],
-                    'lang.num': data['lang.num'],
-                    'desc_word_count': data['desc_word_count'],
-                    '17+': data['17+'],
-                    'Games': data['Games'],
-                    'user_rating': data['user_rating']
-                    }
-        data = pd.DataFrame(dataDict)
+        significant_cols = ['size_bytes', 'rating_count_tot', 'rating_count_ver', 'user_rating_ver', 'ipadSc_urls.num',
+                            'lang.num', 'app_desc', '17+', 'Games', 'user_rating']
+        data = data[significant_cols]
         return data
 
     tmp = data['user_rating']
